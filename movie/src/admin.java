@@ -205,7 +205,7 @@ public class admin {
 				}
 
 				System.out.print("Run time : ");
-				runtime = sc.next();
+				runtime = sc.nextLine();
 
 				System.out.println("아래의 장르중 선택하세요.");
 				sql = "SELECT * FROM GENRE";
@@ -245,7 +245,7 @@ public class admin {
 
 				setSql = setSql.substring(0, setSql.length()-2);
 				sql += setSql + " WHERE tconst = '" + tconst + "'";
-				System.out.println(sql);
+				//System.out.println(sql);
 
 				if(!setSql.equals("")) {
 					stmt.executeUpdate(sql);
@@ -254,6 +254,16 @@ public class admin {
 				}
 				else{
 					System.out.println("변경할 정보가 없습니다.");
+				}
+
+				System.out.println("다른 영상도 수정하시겠습니까?(Y: yes, N:no)");
+				String q;
+				q = sc.nextLine();
+				if (q.equals("y") || q.equals("Y") || q.equals("yes") || q.equals("YES")) continue;
+				else if(q.equals("n") || q.equals("N") || q.equals("no") || q.equals("NO")) break;
+				else {
+					System.out.println("잘못된 값입니다. 이전메뉴로 돌아갑니다.");
+					break;
 				}
 			} catch(SQLException ex) {
 				System.err.println("sql error = " + ex.getMessage());
