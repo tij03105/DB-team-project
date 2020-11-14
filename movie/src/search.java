@@ -7,6 +7,12 @@ public class search {
             String sql = "SELECT tconst, title FROM MOVIE WHERE tconst NOT IN " +
                                  "(SELECT tcon FROM RATING R, PROVIDES P WHERE A_ID = '" + account.ID + "' AND P.R_ID = R.R_ID) ORDER BY tconst";
             ResultSet rs = stmt.executeQuery(sql);
+            
+            if(!rs.isBeforeFirst()) {//검색 결과가 없는 경우
+              	 System.out.printf("검색 결과가 없습니다.\n");
+              	 return;
+              }
+            
             ResultSetMetaData resultSetMetaData = rs.getMetaData();
             int cnt = resultSetMetaData.getColumnCount();
             System.out.printf("    ");
@@ -38,7 +44,12 @@ public class search {
             sql = "SELECT tconst, title FROM MOVIE WHERE title LIKE '%" + title + "%' AND tconst NOT IN " +
                           "(SELECT tcon FROM RATING R, PROVIDES P WHERE A_ID = '" + account.ID + "' AND P.R_ID = R.R_ID)";
             rs = stmt.executeQuery(sql);
-
+            
+            if(!rs.isBeforeFirst()) {//검색 결과가 없는 경우
+           	 System.out.printf("검색 결과가 없습니다.\n");
+           	 return;
+           }
+            
             while(rs.next()){
                 System.out.println(rs.getString(1) + "\t" +rs.getString(2));
             }
@@ -119,9 +130,9 @@ public class search {
             option_cnt++; //option_cnt는 덧붙이기 한 후에 증가시켜야한다.
         }
         
-        sb.append( "AND tconst NOT IN "
-			+ "(SELECT tcon FROM RATING R, PROVIDES P WHERE A_ID = '" + account.ID + "' AND P.R_ID = R.R_ID)";
-        sb.append(" ORDER BY tconst");
+	        sb.append( "AND tconst NOT IN "
+				+ "(SELECT tcon FROM RATING R, PROVIDES P WHERE A_ID = '" + account.ID + "' AND P.R_ID = R.R_ID)");
+	        sb.append(" ORDER BY tconst");
 
         sql = sb.toString();
         System.out.println(sql);
@@ -129,6 +140,11 @@ public class search {
         try {
             ResultSet rs = stmt.executeQuery(sql);
 
+            if(!rs.isBeforeFirst()) {//검색 결과가 없는 경우
+              	 System.out.printf("검색 결과가 없습니다.\n");
+              	 return;
+              }
+            
             while(rs.next()) {
                 System.out.println(rs.getString(1) + "\t" + rs.getString(2));
             }
@@ -249,7 +265,7 @@ public class search {
         }
 
         sql = "insert into RATING values('" + tconst + "', '" + maxconst + "', 0 )";
-        System.out.println(sql);
+        //System.out.println(sql);
 
         try {
             rs = stmt.executeQuery(sql);
@@ -266,7 +282,7 @@ public class search {
 
         sql = "insert into PROVIDES values( " + rating + " ,  '" + maxconst + "', '" + ac_ID + "')"; //여기서 ac_ID만 사용자 이름이면 된다. account table에 없는 이름을 넣으면 참조무결성제약 위반.
 
-        System.out.println(sql);
+        //System.out.println(sql);
 
         try {
             rs = stmt.executeQuery(sql);
@@ -297,7 +313,7 @@ public class search {
 	    
 	mean = Math.round(mean*10.0)/10.0;
         sql = "update  RATING SET Average_Rating = " + mean + " WHERE  Tcon = '" + tconst  + "'";
-        System.out.println(sql);
+        //System.out.println(sql);
 
         try {
             rs = stmt.executeQuery(sql);
