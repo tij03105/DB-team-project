@@ -97,10 +97,25 @@ public class main {
             System.out.println("기능을 선택하세요.");
             /** INSERT CODE HERE **/
             if(account.ADMIN) { // menu for admin
-                System.out.println("1:회원정보 수정, 2:비밀번호 수정, 3:회원탈퇴, 4:로그아웃, 8:영상 등록, 9:영상 수정 0 : 종료");
+                System.out.println("1:회원정보 수정");
+                System.out.println("2:비밀번호 수정");
+                System.out.println("3:회원탈퇴");
+                System.out.println("4:로그아웃");
+                System.out.println("5:평가한 영상 보기");
+
+                System.out.println("7:모든 평가 내역 보기");
+                System.out.println("8:새로운 영상 올리기");
+                System.out.println("9:기존 영상 수정");
+                System.out.println("0 : 종료");
             }
             else{ // menu for customer
-                System.out.println("1:회원정보 수정, 2:비밀번호 수정, 3:회원탈퇴, 4:로그아웃, 5:영상물 메뉴 0 : 종료");
+                System.out.println("1:회원정보 수정");
+                System.out.println("2:비밀번호 수정");
+                System.out.println("3:회원탈퇴");
+                System.out.println("4:로그아웃");
+                System.out.println("5:평가한 영상 보기");
+
+                System.out.println("0 : 종료");
             }
 
             try {
@@ -133,7 +148,13 @@ public class main {
                     account.logOut(conn, stmt);
                     state = false;
                     break;
-               case 8:
+                case 5:
+                    rating.viewMyRating(conn, stmt);
+                    break;
+                case 7:
+                    rating.adminViewRating(conn, stmt);
+                    break;
+                case 8:
                    admin.upload_movie(conn,stmt);
                     break;
                 case 9:
