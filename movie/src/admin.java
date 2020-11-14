@@ -3,6 +3,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
+import java.util.InputMismatchException;
+import java.util.Scanner;
 
 public class admin {
 	private static Scanner sc = new Scanner(System.in);
@@ -11,21 +13,7 @@ public class admin {
     	if(account.ADMIN == false) System.out.println("잘못된 접근 : 관리자가 아닙니다");
 		else {
 			try {
-				String r_id;
 				String input;
-
-				/*
-				sql = "select min(tconst) from movie";
-				ResultSet rs = stmt.executeQuery(sql);
-				rs.next();
-				String minconst = rs.getString(1);
-
-				sql = "select max(tconst) from movie";
-				rs = stmt.executeQuery(sql);
-				rs.next();
-				String maxconst = rs.getString(1);
-				*/
-				
 				String sql = "select max(tconst) from movie";
 				ResultSet rs = stmt.executeQuery(sql);
 				rs.next();
@@ -35,7 +23,6 @@ public class admin {
 				temp++;
 				maxconst = String.format("%08d", temp);
 				maxconst = "t" + maxconst;
-				r_id = maxconst.replace("t","r");
 				
 				sql = "insert into movie values('" + maxconst + "',";
 				System.out.println("영상물 추가를 선택하셨습니다.");
@@ -60,18 +47,18 @@ public class admin {
 		            }
 				}
 				while (true) {
-					System.out.print("관람등급 (성인용:R입력 / 그 외:A입력) :");
+					System.out.println("관람등급 (성인용:R입력 / 그 외:A입력) :");
 					input = sc.next();
 					if (input.equals("R")||input.equals("A")||input.equals("")) {
 						sql = sql + "'" + input + "',";
 						break;
 					}
 					else {
-						System.out.print("R혹은 A를 입력해주세요");
+						System.out.println("R혹은 A를 입력해주세요");
 					}
 				}
 				while (true) {
-				System.out.print("개봉일 (yyyy-mm-dd) : ");
+				System.out.println("개봉일 (yyyy-mm-dd) : ");
 				input = sc.next();
 					try{
 				        SimpleDateFormat  dateFormat = new  SimpleDateFormat("yyyy-MM-dd");
@@ -85,42 +72,50 @@ public class admin {
 				    }
 				}
 				
-				System.out.print("상영시간 (분단위: ");
-				input = sc.next();
-				if (input.equals("null")) sql = sql + "null,";
-				sql = sql + input + ",";
-				
+				while(true) {
+					System.out.println("상영시간 (분단위): ");
+					try {
+						int _input = sc.nextInt();
+						input = Integer.toString(_input);
+						sql = sql + input + ",";
+						break;
+					}catch(InputMismatchException e){
+						System.out.println("유효하지 않은 숫자 입니다.");
+						sc.next();
+						continue;
+					}
+				}
 				
 				while(true) {
-					System.out.print("Genre (Action/Comedy/Romance/Horror/Drama, not null) :");
+					System.out.println("*장르 (Action/Comedy/Romance/Horror/Drama) :");
 					input = sc.next();
 					switch(input) {
 						case "Action":
-							sql = sql + "'g00000001',";
+							sql = sql + "'g00000001')";
 							break;
 						case "Comedy":
-							sql = sql + "'g00000002',";
+							sql = sql + "'g00000002')";
 							break;
 						case "Romance":
-							sql = sql + "'g00000003',";
+							sql = sql + "'g00000003')";
 							break;
 						case "Horror":
-							sql = sql + "'g00000004',";
+							sql = sql + "'g00000004')";
 							break;
 						case "Drama":
-							sql = sql + "'g00000005',";
+							sql = sql + "'g00000005')";
 							break;
 						default:
-							System.out.println("Wrong input. choose one Action/Comedy/Romance/Horror/Drama, not null");
+							System.out.println("유효하지 않은 장르입니다. 다음장르중에서 기입해주세요. Action/Comedy/Romance/Horror/Drama, not null");
 							continue;
 					}
 					break;
 				}
-				
-				rs = stmt.executeQuery(sql);
-				//conn.commit();
+				stmt.executeUpdate(sql);
+				conn.commit();
+				System.out.println("영상물 추가 완료");
 			}catch(SQLException ex) {
-				System.err.println("sql error = " + ex.getMessage());
+				System.err.println("영상물 추가 오류 : " + ex.getMessage());
 				System.exit(1);
 			}
 		

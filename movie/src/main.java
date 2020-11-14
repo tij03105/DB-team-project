@@ -134,6 +134,7 @@ public class main {
                     state = false;
                     break;
                case 8:
+                   admin.upload_movie(conn,stmt);
                     break;
                 case 9:
                     admin.updateMovie(conn, stmt);
