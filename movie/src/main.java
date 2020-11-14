@@ -102,10 +102,12 @@ public class main {
                 System.out.println("3:회원탈퇴");
                 System.out.println("4:로그아웃");
                 System.out.println("5:평가한 영상 보기");
-
-                System.out.println("7:모든 평가 내역 보기");
-                System.out.println("8:새로운 영상 올리기");
-                System.out.println("9:기존 영상 수정");
+                System.out.println("6:모든 영상 검색");
+                System.out.println("7:제목으로 영상 검색");
+                System.out.println("8:조건으로 영상 검색");
+                System.out.println("9:모든 평가 내역 보기");
+                System.out.println("10:새로운 영상 올리기");
+                System.out.println("11:기존 영상 수정");
                 System.out.println("0 : 종료");
             }
             else{ // menu for customer
@@ -114,7 +116,9 @@ public class main {
                 System.out.println("3:회원탈퇴");
                 System.out.println("4:로그아웃");
                 System.out.println("5:평가한 영상 보기");
-
+                System.out.println("6:모든 영상 검색");
+                System.out.println("7:제목으로 영상 검색");
+                System.out.println("8:조건으로 영상 검색");
                 System.out.println("0 : 종료");
             }
 
@@ -125,8 +129,8 @@ public class main {
                 System.out.println("메뉴에 포함된 숫자만 입력하세요.");
                 continue;
             }
-            if(account.ADMIN && 0 > menu || menu > 9) System.out.println("잘못된 번호입니다.");
-            else if(!account.ADMIN && (0 > menu || menu > 6)) System.out.println("잘못된 번호입니다.");
+            if(account.ADMIN && 0 > menu || menu > 11) System.out.println("잘못된 번호입니다.");
+            else if(!account.ADMIN && (0 > menu || menu > 8)) System.out.println("잘못된 번호입니다.");
 
             switch (menu) {
                 case 0:
@@ -151,13 +155,22 @@ public class main {
                 case 5:
                     rating.viewMyRating(conn, stmt);
                     break;
+                case 6:
+                    search.allMovieSearch(conn, stmt);
+                    break;
                 case 7:
-                    rating.adminViewRating(conn, stmt);
+                    search.movieSearchUsingName(conn, stmt);
                     break;
                 case 8:
-                   admin.upload_movie(conn,stmt);
+                    search.selectMovieSearch(conn, stmt);
                     break;
                 case 9:
+                    rating.adminViewRating(conn, stmt);
+                    break;
+                case 10:
+                   admin.upload_movie(conn,stmt);
+                    break;
+                case 11:
                     admin.updateMovie(conn, stmt);
                     break;
             }
