@@ -118,7 +118,9 @@ public class search {
             sb.append(" Runtime_minutes >= " + a + " and Runtime_minutes <= " + b );
             option_cnt++; //option_cnt는 덧붙이기 한 후에 증가시켜야한다.
         }
-
+        
+        sb.append( "AND tconst NOT IN "
+			+ "(SELECT tcon FROM RATING R, PROVIDES P WHERE A_ID = '" + account.ID + "' AND P.R_ID = R.R_ID)";
         sb.append(" ORDER BY tconst");
 
         sql = sb.toString();
