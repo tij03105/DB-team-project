@@ -249,78 +249,53 @@ public class search {
         //tconst가 가진 평점들의 값을 더한 뒤에 평점의 갯수만큼 나누어서 평균 평점을 구한다. 그냥 avg로 바로 구할 수 있다.
         //이제 그 avg값을 tconst의 rating의 Average_Rating에 update한다.
 
-        sql = "select max(R_ID) from RATING";
         try {
+            sql = "SELECT r_id FROM RATING WHERE tcon = '" + tconst + "'";
+            System.out.println(sql);
             rs = stmt.executeQuery(sql);
-            rs.next();
-            maxconst = rs.getString(1);
-            maxconst = maxconst.replace("r", "");
-            int temp = Integer.parseInt(maxconst);
-            temp++;
-            maxconst = String.format("%08d", temp);
-            maxconst = "r" + maxconst;
+            if(!rs.isBeforeFirst()) {
+                sql = "select max(R_ID) from RATING";
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+                rs = stmt.executeQuery(sql);
+                rs.next();
+                maxconst = rs.getString(1);
+                maxconst = maxconst.replace("r", "");
+                int temp = Integer.parseInt(maxconst);
+                temp++;
+                maxconst = String.format("%08d", temp);
+                maxconst = "r" + maxconst;
 
-        sql = "insert into RATING values('" + tconst + "', '" + maxconst + "', 0 )";
-        //System.out.println(sql);
+                sql = "insert into RATING values('" + tconst + "', '" + maxconst + "', 0 )";
+                rs = stmt.executeQuery(sql);
+                conn.commit();
+            }
+            else{
+                rs.next();
+                maxconst = rs.getString(1);
+            }
 
-        try {
-            rs = stmt.executeQuery(sql);
-            conn.commit();
-        } catch (SQLException se) {
-            se.printStackTrace();
-        }
+            //System.out.print("rating insert 완료 !! ");
 
-        //System.out.print("rating insert 완료 !! ");
+            // provides에 사용자가 입력한 평점, R_ID(rating에서 쓴것 그대로), A_ID(사용자가 입력한 id), 를 insert한다.
+            //tconst가 가진 평점들의 값을 provides를 통해 더한 뒤에 평점의 갯수만큼 나누어서 평균 평점을 구한다. 그냥 avg로 바로 구할 수 있다.
+            //이제 그 avg값을 tconst의 rating의 Average_Rating에 update한다.
 
-        // provides에 사용자가 입력한 평점, R_ID(rating에서 쓴것 그대로), A_ID(사용자가 입력한 id), 를 insert한다.
-        //tconst가 가진 평점들의 값을 provides를 통해 더한 뒤에 평점의 갯수만큼 나누어서 평균 평점을 구한다. 그냥 avg로 바로 구할 수 있다.
-        //이제 그 avg값을 tconst의 rating의 Average_Rating에 update한다.
-
-        sql = "insert into PROVIDES values( " + rating + " ,  '" + maxconst + "', '" + ac_ID + "')"; //여기서 ac_ID만 사용자 이름이면 된다. account table에 없는 이름을 넣으면 참조무결성제약 위반.
-
-        //System.out.println(sql);
-
-        try {
+            sql = "insert into PROVIDES values( " + rating + " ,  '" + maxconst + "', '" + ac_ID + "')"; //여기서 ac_ID만 사용자 이름이면 된다. account table에 없는 이름을 넣으면 참조무결성제약 위반.
             rs = stmt.executeQuery(sql);
             conn.commit();
             //ystem.out.print("\n provides insert 진입 @@ ");
 
-        } catch (SQLException se) {
-            se.printStackTrace();
-        }
-
-        //System.out.print("provides insert 완료 !! ");
-
-        sql = "select AVG(Rating) FROM RATING, PROVIDES WHERE RATING.Tcon = '" + tconst + "' and RATING.R_ID = PROVIDES.R_ID";
-
-        Double mean = 0.0;
-        //System.out.println(sql);
-
-        try {
+            sql = "select AVG(Rating) FROM PROVIDES WHERE R_ID = '" + maxconst + "'";
             rs = stmt.executeQuery(sql);
-
-            while(rs.next()) {
-                mean = rs.getDouble(1);
-            }
-
-        } catch (SQLException se) {
-            se.printStackTrace();
-        }
-	    
-	mean = Math.round(mean*10.0)/10.0;
-        sql = "update  RATING SET Average_Rating = " + mean + " WHERE  Tcon = '" + tconst  + "'";
-        //System.out.println(sql);
-
-        try {
+            rs.next();
+            Double mean = rs.getDouble(1);
+            mean = Math.round(mean*10.0)/10.0;
+            sql = "update RATING SET Average_Rating = " + mean + " WHERE  Tcon = '" + tconst  + "'";
             rs = stmt.executeQuery(sql);
             conn.commit();
-        } catch (SQLException se) {
-            se.printStackTrace();
+            System.out.println("평가 입력이 완료되었습니다.\n");
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        System.out.println("평가 입력이 완료되었습니다.\n");
     }
 }
