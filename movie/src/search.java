@@ -294,7 +294,8 @@ public class search {
         } catch (SQLException se) {
             se.printStackTrace();
         }
-
+	    
+	mean = Math.round(mean*10.0)/10.0;
         sql = "update  RATING SET Average_Rating = " + mean + " WHERE  Tcon = '" + tconst  + "'";
         System.out.println(sql);
 
