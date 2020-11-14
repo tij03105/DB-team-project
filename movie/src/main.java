@@ -110,7 +110,7 @@ public class main {
                 System.out.println("메뉴에 포함된 숫자만 입력하세요.");
                 continue;
             }
-            if(account.ADMIN && 0 > menu || menu > 5) System.out.println("잘못된 번호입니다.");
+            if(account.ADMIN && 0 > menu || menu > 6) System.out.println("잘못된 번호입니다.");
             if(!account.ADMIN && 0 > menu || menu > 6) System.out.println("잘못된 번호입니다.");
 
             switch (menu) {
