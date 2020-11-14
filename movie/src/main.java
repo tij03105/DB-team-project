@@ -125,8 +125,8 @@ public class main {
                 System.out.println("메뉴에 포함된 숫자만 입력하세요.");
                 continue;
             }
-            if(account.ADMIN && 0 > menu || menu > 9) System.out.println("잘못된 번호입니다1.");
-            else if(!account.ADMIN && (0 > menu || menu > 6)) System.out.println("잘못된 번호입니다2.");
+            if(account.ADMIN && 0 > menu || menu > 9) System.out.println("잘못된 번호입니다.");
+            else if(!account.ADMIN && (0 > menu || menu > 6)) System.out.println("잘못된 번호입니다.");
 
             switch (menu) {
                 case 0:
