@@ -183,7 +183,7 @@ public class admin {
 				}
 
 				String title, titile_type, adult, start_year;
-				int runtime, gCode;
+				String runtime, gCode;
 				System.out.println("수정을 원하지 않는 정보는 비워두세요.");
 
 				System.out.print("Title : ");
@@ -205,28 +205,52 @@ public class admin {
 				}
 
 				System.out.print("Run time : ");
-				runtime = sc.nextInt();
+				runtime = sc.next();
 
 				System.out.println("아래의 장르중 선택하세요.");
-				System.out.println();
+				sql = "SELECT * FROM GENRE";
+				rs = stmt.executeQuery(sql);
+				String genre;
+				cnt = 1;
+				ArrayList<String> gen_list = new ArrayList<>();
+				while(rs.next()){
+					gen_list.add(rs.getString(1));
+					genre = rs.getString(2);
+					System.out.println(cnt + "	" + genre);
+					cnt++;
+				}
+
+				System.out.printf("장르선택(번호), 빈칸 불가능:");
+				try{
+					int idx = sc.nextInt();
+					sc.nextLine();
+					gCode = gen_list.get(idx-1);
+				} catch (InputMismatchException e){
+					System.out.println("잘못된 입력입니다. 이전메뉴로 돌아갑니다.");
+					break;
+				} catch (IndexOutOfBoundsException e){
+					System.out.println("잘못된 입력입니다. 이전메뉴로 돌아갑니다.");
+					break;
+				}
+
 				sql = "UPDATE MOVIE SET ";
 				String setSql = "";
-				/*
-				if(!phone.equals("")) setSql += "phone = '" + phone + "', ";
-				if(!name.equals("")) setSql += "name = '" + name + "', ";
-				if(!address.equals("")) setSql += "address = '" + address + "', ";
-				if(sex.equals("0")) setSql += "sex = 'M', ";
-				else if(sex.equals("1")) setSql += "sex = 'F', ";
-				if(!date.equals("")) setSql += "bdate = TO_DATE('" + date.substring(0,4) + "-" + date.substring(4,6) + "-" + date.substring(6) + "', 'yyyy-mm-dd'), ";
-				if(!job.equals("")) setSql += "job = '" + job + "', ";
+
+				if(!title.equals("")) setSql += "title = '" + title + "', ";
+				if(!titile_type.equals("")) setSql += "titile_type = '" + titile_type + "', ";
+				if(!adult.equals("")) setSql += "is_adult = '" + adult + "', ";
+				if(!start_year.equals("")) setSql += "start_year = TO_DATE('" + start_year.substring(0,4) + "-" + start_year.substring(4,6) + "-" + start_year.substring(6) + "', 'yyyy-mm-dd'), ";
+				if(!runtime.equals("")) setSql += "runtime_minutes = " + Integer.parseInt(runtime) + ", ";
+				if(!gCode.equals("")) setSql += "gcode = '" + gCode + "', ";
+
 				setSql = setSql.substring(0, setSql.length()-2);
-				sql += setSql + " WHERE id = '" + ID + "'";
-				//System.out.println(sql);
-				 */
+				sql += setSql + " WHERE tconst = '" + tconst + "'";
+				System.out.println(sql);
+
 				if(!setSql.equals("")) {
 					stmt.executeUpdate(sql);
 					conn.commit();
-					System.out.println("회원정보가 수정되었습니다.");
+					System.out.println("영상 정보가 수정되었습니다.");
 				}
 				else{
 					System.out.println("변경할 정보가 없습니다.");
