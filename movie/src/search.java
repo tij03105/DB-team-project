@@ -60,12 +60,11 @@ public class search {
     }
 
     public static void selectMovieSearch(Connection conn, Statement stmt){
-        String sql = "SELECT DISTINCT tconst, title FROM MOVIE, GENRE, VERSION";
-        String sqlv = "SELECT DISTINCT MOVIE.tconst, VERSION.original_title FROM MOVIE, GENRE, VERSION";
-        int option_cnt = 0;
-
+        String sql = "SELECT DISTINCT tconst, title FROM MOVIE, GENRE, VERSION WHERE " +
+                             "tconst NOT IN (SELECT tcon FROM RATING R, PROVIDES P WHERE A_ID = '" + account.ID + "' AND P.R_ID = R.R_ID)";
+        String sqlv = "SELECT DISTINCT MOVIE.tconst, VERSION.original_title FROM MOVIE, GENRE, VERSION WHERE " +
+                              "tconst NOT IN (SELECT tcon FROM RATING R, PROVIDES P WHERE A_ID = '" + account.ID + "' AND P.R_ID = R.R_ID)";
         StringBuffer sb = new StringBuffer();
-
         String s = "";
         Scanner scan_option = new Scanner(System.in);
 
@@ -77,66 +76,31 @@ public class search {
         }
         else{
             sb.append(sqlv);
-            if(option_cnt > 0){
-                sb.append(" and ");
-            }
-            else{
-                sb.append(" WHERE ");
-            }
-            sb.append(" VERSION.nation = '"+s+"' and VERSION.Tcon = MOVIE.Tconst");
-            option_cnt++; //option_cnt는 덧붙이기 한 후에 증가시켜야한다.
+            sb.append(" AND VERSION.nation = '"+s+"' and VERSION.Tcon = MOVIE.Tconst");
         }
-
 
         System.out.print("\n하나의 영상물 타입을 선택하세요 (movie, tv_series, knuMovieDB_Original)\n 상관없는 경우 0을 입력하세요.: ");
         s = scan_option.nextLine();
         if(!s.equals("0")){
-            if(option_cnt > 0){
-                sb.append(" and ");
-            }
-            else{
-                sb.append(" WHERE ");
-            }
-            sb.append(" title_type = '" + s + "'");
-            option_cnt++;
+            sb.append(" AND title_type = '" + s + "'");
         }
 
         System.out.print("\n하나의 영상물 장르를 선택하세요 (Action, Comedy, Romance, Horror, Drama)\n 상관없는 경우 0을 입력하세요.: ");
         s = scan_option.nextLine();
         if( !s.equals("0")){
-            if(option_cnt > 0){
-                sb.append(" and ");
-            }
-            else{
-                sb.append(" WHERE ");
-            }
-            sb.append(" GENRE.genre = '"+s+"' and GENRE.genre_code = movie.gcode");
-            option_cnt++; //option_cnt는 덧붙이기 한 후에 증가시켜야한다.
+            sb.append(" AND GENRE.genre = '"+s+"' and GENRE.genre_code = movie.gcode");
         }
-
-
 
         System.out.print("\n영상물 Runtime을 입력하세요 (ex)110 180입력시 110분~180분 사이의 runtime을 가진 영상물 선택\n 상관없는 경우 0 0을 입력하세요.: ");
         int a = scan_option.nextInt();
         int b = scan_option.nextInt();
         if(a != 0 && b != 0 && a <= b){
-            if(option_cnt > 0){
-                sb.append(" and ");
-            }
-            else{
-                sb.append(" WHERE ");
-            }
-            sb.append(" Runtime_minutes >= " + a + " and Runtime_minutes <= " + b );
-            option_cnt++; //option_cnt는 덧붙이기 한 후에 증가시켜야한다.
+            sb.append(" AND Runtime_minutes >= " + a + " and Runtime_minutes <= " + b );
         }
-        
-	        sb.append( "AND tconst NOT IN "
-				+ "(SELECT tcon FROM RATING R, PROVIDES P WHERE A_ID = '" + account.ID + "' AND P.R_ID = R.R_ID)");
-	        sb.append(" ORDER BY tconst");
+        sb.append(" ORDER BY tconst");
 
         sql = sb.toString();
         System.out.println(sql);
-
         try {
             ResultSet rs = stmt.executeQuery(sql);
 
