@@ -97,10 +97,10 @@ public class main {
             System.out.println("기능을 선택하세요.");
             /** INSERT CODE HERE **/
             if(account.ADMIN) { // menu for admin
-                System.out.println("1:회원정보 수정, 2:비밀번호 수정, 3:회원탈퇴, 4:로그아웃, 5:영상물 추가 0 : 종료");
+                System.out.println("1:회원정보 수정, 2:비밀번호 수정, 3:회원탈퇴, 4:로그아웃, 5:영상물 추가, 6:모든 평가 내역 보기, 0 : 종료");
             }
             else{ // menu for customer
-                System.out.println("1:회원정보 수정, 2:비밀번호 수정, 3:회원탈퇴, 4:로그아웃, 5:영상물 메뉴 0 : 종료");
+                System.out.println("1:회원정보 수정, 2:비밀번호 수정, 3:회원탈퇴, 4:로그아웃, 5:영상물 메뉴, 6:내가 내린 평가 보기, 0: 종료");
             }
 
             try {
@@ -134,8 +134,12 @@ public class main {
                     state = false;
                     break;
                case 5:
-                    if(account.ADMIN == TRUE) admin.upload_movie(conn,stmt);
-                    break;     
+                    if(account.ADMIN == True) admin.upload_movie(conn,stmt);
+                    else 
+                    break;
+                case 6:
+                    if(account.ADMIN == True) rating.adminViewRating(conn,stmt);
+                    else rating.viewMyRating(conn,stmt);
             }
         }
     }
