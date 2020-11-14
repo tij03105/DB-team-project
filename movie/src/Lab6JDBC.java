@@ -363,8 +363,7 @@ public class Test {
 		ResultSet rs = null; 
 		Scanner scan = new Scanner(System.in); 
 		
-		System.out.print("\n당신의 ID를 입력하세요 : "); // 수정해야함 로그인 한 ID 받아올 수 있음. 입력 받을필요없음
-		String ac_ID = scan.nextLine();
+		String ac_ID = account.ID;
 		
 		System.out.print("\n영상물에 대한 평점을 입력해주세요 (0.0~10.0) : ");
 		double rating = scan.nextDouble();
