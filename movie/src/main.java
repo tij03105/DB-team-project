@@ -88,7 +88,7 @@ public class main {
         while(state) {
             System.out.println("기능을 선택하세요.");
             /** INSERT CODE HERE **/
-            System.out.println("1:회원정보 수정, 2:비밀번호 수정, 3:회원탈퇴, 4:로그아웃 0 : 종료");
+            System.out.println("1:회원정보 수정, 2:비밀번호 수정, 3:회원탈퇴, 4:로그아웃, 5:영상물 메뉴 0 : 종료");
             menu = sc.nextInt();
             switch (menu) {
                 case 0:
@@ -110,6 +110,10 @@ public class main {
                     account.logOut(conn, stmt);
                     state = false;
                     break;
+               case 5:
+                    search_rate(conn, stmt);
+                    state = false;
+                    break;     
             }
         }
     }
