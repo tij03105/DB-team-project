@@ -12,7 +12,7 @@ public class rating {
 		try {
 			String sql = "select m.title, r.average_rating, p.rating "
 					+"from movie m, rating r, provides p, account a "
-					+"where m.r_id = r.r_id and "
+					+"where m.tconst = r.tcon and "
 					+"r.r_id = p.r_id and "
 					+"p.a_id = a.id and "
 					+"a.id = "
@@ -44,7 +44,7 @@ public class rating {
 			try {
 				String sql = "select m.title, r.average_rating, a.id, p.rating "
 						+ "from movie m, rating r, provides p, account a "
-						+ "where m.r_id = r.r_id and "
+						+ "where m.tconst = r.tcon and "
 						+ "  r.r_id = p.r_id and "
 						+ "  p.a_id = a.id";
 				ResultSet rs = stmt.executeQuery(sql);
