@@ -2,6 +2,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class main {
@@ -65,7 +66,14 @@ public class main {
         while(state) {
             System.out.println("기능을 선택하세요.");
             System.out.println("1:회원가입, 2:로그인, 0 : 종료");
-            menu = sc.nextInt();
+            try {
+                menu = sc.nextInt();
+            }catch (InputMismatchException e){
+                sc.nextLine();
+                System.out.println("메뉴에 포함된 숫자만 입력하세요.");
+                continue;
+            }
+            if(0 > menu || 2 < menu) System.out.println("잘못된 번호입니다.");
             switch (menu) {
                 case 0:
                     state = false;
@@ -88,8 +96,23 @@ public class main {
         while(state) {
             System.out.println("기능을 선택하세요.");
             /** INSERT CODE HERE **/
-            System.out.println("1:회원정보 수정, 2:비밀번호 수정, 3:회원탈퇴, 4:로그아웃, 5:영상물 메뉴 0 : 종료");
-            menu = sc.nextInt();
+            if(account.ADMIN) { // menu for admin
+                System.out.println("1:회원정보 수정, 2:비밀번호 수정, 3:회원탈퇴, 4:로그아웃 0 : 종료");
+            }
+            else{ // menu for customer
+                System.out.println("1:회원정보 수정, 2:비밀번호 수정, 3:회원탈퇴, 4:로그아웃, 5:영상물 메뉴 0 : 종료");
+            }
+
+            try {
+                menu = sc.nextInt();
+            }catch (InputMismatchException e){
+                sc.nextLine();
+                System.out.println("메뉴에 포함된 숫자만 입력하세요.");
+                continue;
+            }
+            if(account.ADMIN && 0 > menu || menu > 5) System.out.println("잘못된 번호입니다.");
+            if(!account.ADMIN && 0 > menu || menu > 6) System.out.println("잘못된 번호입니다.");
+
             switch (menu) {
                 case 0:
                     state = false;
@@ -111,8 +134,6 @@ public class main {
                     state = false;
                     break;
                case 5:
-                    search_rate(conn, stmt);
-                    state = false;
                     break;     
             }
         }
