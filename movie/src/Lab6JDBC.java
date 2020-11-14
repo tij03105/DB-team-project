@@ -1,3 +1,5 @@
+
+
 package phase3;
 /**************************************************
  * Copyright (c) 2020 KNU DEAL Lab. To Present
@@ -18,7 +20,7 @@ import java.io.IOException;
  * 
  * @author yksuh
  */
-public class Lab6JDBC {
+public class Test {
 	public static final String URL = "jdbc:oracle:thin:@localhost:1521:orcl";
 	public static final String USER_UNIVERSITY = "movie";
 	public static final String USER_PASSWD = "movie";
@@ -64,7 +66,7 @@ public class Lab6JDBC {
 	}	
 
 
-	public static void search_movie(Con	nection conn, Statement stmt){
+	public static void search_movie(Connection conn, Statement stmt){
 		String sql = "";
 		ResultSet rs = null; 
 		int button = -1;
@@ -361,8 +363,7 @@ public class Lab6JDBC {
 		ResultSet rs = null; 
 		Scanner scan = new Scanner(System.in); 
 		
-		System.out.print("\n당신의 ID를 입력하세요 : "); // 수정해야함 로그인 한 ID 받아올 수 있음. 입력 받을필요없음
-		String ac_ID = scan.nextLine();
+		String ac_ID = account.ID;
 		
 		System.out.print("\n영상물에 대한 평점을 입력해주세요 (0.0~10.0) : ");
 		double rating = scan.nextDouble();
@@ -384,13 +385,12 @@ public class Lab6JDBC {
 			rs = stmt.executeQuery(sql);
 			rs.next();
 			maxconst = rs.getString(1);
-			maxconst = maxconst.replace("t", "");
+			maxconst = maxconst.replace("r", "");
+			System.out.println(maxconst);
 			int temp = Integer.parseInt(maxconst);
 			temp++;
 			maxconst = String.format("%08d", temp);
 			maxconst = "r" + maxconst;
-			
-			
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -400,13 +400,83 @@ public class Lab6JDBC {
 		sql = "insert into RATING values('" + tconst + "', '" + maxconst + "', 0 )";
 		System.out.println(sql);
 		
+	
+		try {
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(sql);
+
+//			rs.close();
+//			stmt.close();
+//			conn.close();
+			} catch (SQLException se) {
+	            se.printStackTrace();
+	        } 
+		
+		System.out.print("rating insert 완료 !! ");
+		
+		// provides에 사용자가 입력한 평점, R_ID(rating에서 쓴것 그대로), A_ID(사용자가 입력한 id), 를 insert한다.
+				//tconst가 가진 평점들의 값을 provides를 통해 더한 뒤에 평점의 갯수만큼 나누어서 평균 평점을 구한다. 그냥 avg로 바로 구할 수 있다. 
+				//이제 그 avg값을 tconst의 rating의 Average_Rating에 update한다. 
+		
+		sql = "insert into PROVIDES values( " + rating + " ,  '" + maxconst + "', '" + ac_ID + "')"; //여기서 ac_ID만 사용자 이름이면 된다. account table에 없는 이름을 넣으면 참조무결성제약 위반.
+		
+		System.out.println(sql);
+		
+		
+		try {
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(sql);
+			
+			System.out.print("\n provides insert 진입 @@ ");
+
+			} catch (SQLException se) {
+	            se.printStackTrace();
+	        } 
+		
+		System.out.print("provides insert 완료 !! ");
+		
+		sql = "select AVG(Rating) FROM RATING, PROVIDES WHERE RATING.Tcon = '" + tconst + "' and RATING.R_ID = PROVIDES.R_ID";
+		
+		Double mean = 0.0;
+		System.out.println(sql);
+		
+		try {
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(sql);
+			
+			while(rs.next())
+            {
+               
+                  mean = rs.getDouble(1);
+                
+            }
+			
+			} catch (SQLException se) {
+	            se.printStackTrace();
+	        } 
+		
+		//이제 그 avg값을 tconst의 rating의 Average_Rating에 update한다. 
+		//일단 
+		
+		sql = "update  RATING SET Average_Rating = " + mean + " WHERE  Tcon = '" + tconst  + "'"; 
+		System.out.println(sql);
+		
+		try {
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(sql);
+
+			} catch (SQLException se) {
+	            se.printStackTrace();
+	        } 
+		
+		System.out.println("평가 입력이 완료되었습니다.\n");
+		search_movie(conn, stmt);
+		//////////////////////////close 해주기.
+//		rs.close();
+//		stmt.close();
+//		conn.close();
 	}
-	
-	
 	
 }
 
-	
-	
-	
 	
