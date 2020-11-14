@@ -1,3 +1,4 @@
+package mmovie;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -8,7 +9,7 @@ import java.util.Scanner;
 public class rating {
 
 	public static void viewMyRating(Connection conn, Statement stmt) {
-		// 로그인 시 자신이 내린 평가 내역 보기
+		// 로그인 시 자신이 내린 평가 내역 보기.
 		try {
 			String sql = "select m.title, r.average_rating, p.rating "
 					+"from movie m, rating r, provides p, account a "
