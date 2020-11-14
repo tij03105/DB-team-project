@@ -1,3 +1,4 @@
+
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -87,29 +88,31 @@ public class admin {
 				}
 				
 				while(true) {
-					System.out.println("*장르 (Action/Comedy/Romance/Horror/Drama) :");
-					input = sc.next();
-					switch(input) {
-						case "Action":
-							sql = sql + "'g00000001')";
-							break;
-						case "Comedy":
-							sql = sql + "'g00000002')";
-							break;
-						case "Romance":
-							sql = sql + "'g00000003')";
-							break;
-						case "Horror":
-							sql = sql + "'g00000004')";
-							break;
-						case "Drama":
-							sql = sql + "'g00000005')";
-							break;
-						default:
-							System.out.println("유효하지 않은 장르입니다. 다음장르중에서 기입해주세요. Action/Comedy/Romance/Horror/Drama, not null");
-							continue;
+					System.out.println("아래의 장르중 선택하세요.");
+					sql = "SELECT * FROM GENRE";
+					rs = stmt.executeQuery(sql);
+					String genre;
+					int cnt = 1;
+					ArrayList<String> gen_list = new ArrayList<>();
+					while(rs.next()){
+						gen_list.add(rs.getString(1));
+						genre = rs.getString(2);
+						System.out.println(cnt + "	" + genre);
+						cnt++;
 					}
-					break;
+					System.out.printf("장르선택(번호), 빈칸 불가능:");
+					try{
+						int idx = sc.nextInt();
+						sc.nextLine();
+						input = gen_list.get(idx-1);
+						break;
+					} catch (InputMismatchException e){
+						System.out.println("잘못된 입력입니다.");
+						continue;
+					} catch (IndexOutOfBoundsException e){
+						System.out.println("잘못된 입력입니다.");
+						continue;
+					}
 				}
 				stmt.executeUpdate(sql);
 				conn.commit();
