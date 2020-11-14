@@ -100,7 +100,7 @@ public class search {
         sb.append(" ORDER BY tconst");
 
         sql = sb.toString();
-        System.out.println(sql);
+        //System.out.println(sql);
         try {
             ResultSet rs = stmt.executeQuery(sql);
 
