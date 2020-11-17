@@ -18,13 +18,17 @@ public class rating {
 					+"a.id = "
 					+ "'" + account.ID + "'";
 			ResultSet rs = stmt.executeQuery(sql);
+			if(!rs.isBeforeFirst()) {
+				System.out.println("평가한 영상물이 없습니다.");
+				return;
+			}
 			System.out.println("회원님이 평가하신 영상물들의 목록입니다.\n"
 					+"------------------------------------------------------------");
 			while(rs.next()) {
 				// no impedance mismatch in JDBC
 				String title= rs.getString(1);
-				int av_rating = rs.getInt(2);
-				int rating = rs.getInt(3);
+				double av_rating = rs.getDouble(2);
+				double rating = rs.getDouble(3);
 				
 				System.out.println("영상물 제목 = " + title 
 						+", 평균 평점 = " + av_rating 
@@ -53,9 +57,9 @@ public class rating {
 				while(rs.next()) {
 					// no impedance mismatch in JDBC
 					String title= rs.getString(1);
-					int av_rating = rs.getInt(2);
+					double av_rating = rs.getDouble(2);
 					String rating_user_id = rs.getString(3);
-					int rating = rs.getInt(4);
+					double rating = rs.getDouble(4);
 					
 					System.out.println("영상물 제목 = " + title 
 							+", 평균 평점 = " + av_rating 
