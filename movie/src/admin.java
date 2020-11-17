@@ -243,6 +243,7 @@ public class admin {
 						gCode = gen_list.get(idx - 1);
 					} catch (InputMismatchException e) {
 						System.out.println("잘못된 입력입니다. 이전메뉴로 돌아갑니다.");
+						sc.nextLine();
 						break;
 					} catch (IndexOutOfBoundsException e) {
 						System.out.println("잘못된 입력입니다. 이전메뉴로 돌아갑니다.");
