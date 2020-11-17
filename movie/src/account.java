@@ -18,7 +18,7 @@ public class account {
         String id , pw, phone, name; // Not null data
         String address, sex, date, job;
         String membership = "Basic";
-        int act_limit = 3, rat_limit = 10;
+        final int act_limit = 3, rat_limit = 10;
 
         String sql = "";
         ResultSet rs;
@@ -279,10 +279,10 @@ public class account {
                 else if(sex.equals("1")) setSql += "sex = 'F', ";
                 if(!date.equals("")) setSql += "bdate = TO_DATE('" + date.substring(0,4) + "-" + date.substring(4,6) + "-" + date.substring(6) + "', 'yyyy-mm-dd'), ";
                 if(!job.equals("")) setSql += "job = '" + job + "', ";
-                setSql = setSql.substring(0, setSql.length()-2);
-                sql += setSql + " WHERE id = '" + ID + "'";
-                //System.out.println(sql);
+
                 if(!setSql.equals("")) {
+                    setSql = setSql.substring(0, setSql.length()-2);
+                    sql += setSql + " WHERE id = '" + ID + "'";
                     stmt.executeUpdate(sql);
                     conn.commit();
                     System.out.println("회원정보가 수정되었습니다.");
