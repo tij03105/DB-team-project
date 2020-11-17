@@ -1,4 +1,6 @@
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class search {
@@ -69,40 +71,138 @@ public class search {
         Scanner scan_option = new Scanner(System.in);
 
         System.out.print(" 검색할 조건을 입력받습니다. \n ");
-        System.out.print("하나의 영상물 버전을 선택하세요 (UA, KR, JP, CN, RU, SP, IN, AU )\n 상관없는 경우 0을 입력하세요.: ");
-        s = scan_option.nextLine();
-        if( s.equals("0")){
-            sb.append(sql);
-        }
-        else{
-            sb.append(sqlv);
-            sb.append(" AND VERSION.nation = '"+s+"' and VERSION.Tcon = MOVIE.Tconst");
-        }
-
-        System.out.print("\n하나의 영상물 타입을 선택하세요 (movie, tv_series, knuMovieDB_Original)\n 상관없는 경우 0을 입력하세요.: ");
-        s = scan_option.nextLine();
-        if(!s.equals("0")){
-            sb.append(" AND title_type = '" + s + "'");
-        }
-
-        System.out.print("\n하나의 영상물 장르를 선택하세요 (Action, Comedy, Romance, Horror, Drama)\n 상관없는 경우 0을 입력하세요.: ");
-        s = scan_option.nextLine();
-        if( !s.equals("0")){
-            sb.append(" AND GENRE.genre = '"+s+"' and GENRE.genre_code = movie.gcode");
-        }
-
-        System.out.print("\n영상물 Runtime을 입력하세요 (ex)110 180입력시 110분~180분 사이의 runtime을 가진 영상물 선택\n 상관없는 경우 0 0을 입력하세요.: ");
-        int a = scan_option.nextInt();
-        int b = scan_option.nextInt();
-        if(a != 0 && b != 0 && a <= b){
-            sb.append(" AND Runtime_minutes >= " + a + " and Runtime_minutes <= " + b );
-        }
-        sb.append(" ORDER BY tconst");
-
-        sql = sb.toString();
-        //System.out.println(sql);
         try {
-            ResultSet rs = stmt.executeQuery(sql);
+            String sub_sql = "SELECT DISTINCT nation FROM VERSION";
+            ResultSet rs = stmt.executeQuery(sub_sql);
+
+            ArrayList<String> version_list = new ArrayList<>();
+            while (rs.next()) {
+                version_list.add(rs.getString(1));
+            }
+
+            int vCnt = 0;
+            while (true) {
+                int cnt = 1;
+                System.out.println("아래의 버전중 하나를 선택하세요. 순차적인 입력으로 다중 선택 가능(ex 1입력 2입력)");
+                for (int i = 0; i < version_list.size(); i++) {
+                    System.out.println(cnt + "	" + version_list.get(i));
+                    cnt++;
+                }
+
+                System.out.printf("번호(버전선택), 공백(선택안함):");
+                try {
+                    String input = scan_option.nextLine();
+                    if (input.equals("")) break;
+                    else if (!input.matches("[0-9]+")) System.out.println("잘못된 입력입니다.");
+                    else {
+                        int idx = Integer.parseInt(input);
+                        String nation = version_list.get(idx - 1);
+                        version_list.remove(idx - 1);
+                        if (vCnt == 0) {
+                            sb.append(sqlv);
+                            sb.append(" AND (VERSION.nation = '" + nation + "'");
+                        } else sb.append(" OR VERSION.nation = '" + nation + "'");
+                        sb.append(" AND VERSION.Tcon = MOVIE.Tconst");
+                        vCnt++;
+                    }
+                } catch (InputMismatchException e) {
+                    System.out.println("잘못된 입력입니다.");
+                    scan_option.nextLine();
+                } catch (IndexOutOfBoundsException e) {
+                    System.out.println("잘못된 입력입니다.");
+                }
+            }
+
+            if(vCnt > 0) sb.append(")");
+            else if(vCnt == 0) sb.append(sql);
+
+            while (true) {
+                System.out.println("아래의 영상물 타입 중 하나를 선택하세요.");
+                String sql_t = "select distinct title_type from movie";
+                rs = stmt.executeQuery(sql_t);
+                String m_type;
+                int cnt = 1;
+                ArrayList<String> type_list = new ArrayList<>();
+                while(rs.next()){
+                    m_type = rs.getString(1);
+                    type_list.add(m_type);
+                    System.out.println(cnt + "   " + m_type);
+                    cnt++;
+                }
+                System.out.println("타입선택(번호), 상관 없음 : 0");
+                try{
+                    int idx = scan_option.nextInt();
+                    scan_option.nextLine();
+                    if (idx == 0) {
+                        break;
+                    }
+                    m_type = type_list.get(idx-1);
+                } catch (InputMismatchException e){
+                    System.out.println("잘못된 입력입니다. 이전메뉴로 돌아갑니다.");
+                    scan_option.next();
+                    continue;
+                } catch (IndexOutOfBoundsException e){
+                    System.out.println("잘못된 입력입니다. 이전메뉴로 돌아갑니다.");
+                    continue;
+                }
+                sb.append(" AND title_type = '" + m_type + "'");
+                break;
+            }
+
+            sql = "SELECT * FROM GENRE";
+            rs = stmt.executeQuery(sql);
+
+            ArrayList<String> gen_list = new ArrayList<>();
+            ArrayList<String> gcode_list = new ArrayList<>();
+            while (rs.next()) {
+                gcode_list.add(rs.getString(1));
+                gen_list.add(rs.getString(2));
+            }
+
+            int gCnt = 0;
+            while(true) {
+                int cnt = 1;
+                System.out.println("아래의 장르중 하나를 선택하세요. 순차적인 입력으로 다중 선택 가능(ex 1입력 2입력)");
+                for(int i=0;i<gen_list.size();i++) {
+                    System.out.println(cnt + "	" + gen_list.get(i));
+                    cnt++;
+                }
+
+                System.out.printf("번호(장르선택), 공백(선택안함):");
+                try {
+                    String input = scan_option.nextLine();
+                    if(input.equals("")) break;
+                    else if(!input.matches("[0-9]+")) System.out.println("잘못된 입력입니다.");
+                    else {
+                        int idx = Integer.parseInt(input);
+                        String gCode = gcode_list.get(idx - 1);
+                        gen_list.remove(idx-1);
+                        gcode_list.remove(idx-1);
+                        if(gCnt == 0) sb.append(" AND (gCode = '" + gCode + "'");
+                        else sb.append(" OR gCode = '" + gCode + "'");
+                        gCnt++;
+                    }
+                } catch (InputMismatchException e) {
+                    System.out.println("잘못된 입력입니다.");
+                    scan_option.nextLine();
+                } catch (IndexOutOfBoundsException e) {
+                    System.out.println("잘못된 입력입니다.");
+                }
+            }
+            if(gCnt > 0) sb.append(")");
+
+            System.out.print("\n영상물 Runtime을 입력하세요 (ex)110 180입력시 110분~180분 사이의 runtime을 가진 영상물 선택\n 상관없는 경우 0 0을 입력하세요.: ");
+            int a = scan_option.nextInt();
+            int b = scan_option.nextInt();
+            if(a != 0 && b != 0 && a <= b){
+                sb.append(" AND Runtime_minutes >= " + a + " and Runtime_minutes <= " + b );
+            }
+            sb.append(" ORDER BY tconst");
+
+            sql = sb.toString();
+            //System.out.println(sql);
+
+            rs = stmt.executeQuery(sql);
 
             if(!rs.isBeforeFirst()) {//검색 결과가 없는 경우
               	 System.out.printf("검색 결과가 없습니다.\n");
