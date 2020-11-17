@@ -108,6 +108,7 @@ public class main {
                 System.out.println("9:모든 평가 내역 보기");
                 System.out.println("10:새로운 영상 올리기");
                 System.out.println("11:기존 영상 수정");
+                System.out.println("12:회원 등급 변경");
                 System.out.println("0 : 종료");
             }
             else{ // menu for customer
@@ -129,7 +130,7 @@ public class main {
                 System.out.println("메뉴에 포함된 숫자만 입력하세요.");
                 continue;
             }
-            if(account.ADMIN && 0 > menu || menu > 11) System.out.println("잘못된 번호입니다.");
+            if(account.ADMIN && 0 > menu || menu > 12) System.out.println("잘못된 번호입니다.");
             else if(!account.ADMIN && (0 > menu || menu > 8)) System.out.println("잘못된 번호입니다.");
 
             switch (menu) {
@@ -172,6 +173,9 @@ public class main {
                     break;
                 case 11:
                     admin.updateMovie(conn, stmt);
+                    break;
+                case 12:
+                    admin.manageAccount(conn, stmt);
                     break;
             }
         }
