@@ -30,9 +30,10 @@ public class admin {
 				System.out.println("정보를 입력하세요. *이 붙은 정보는 필수로 입력해야하는 정보입니다. ");
 				
 				while (true) {
-					System.out.println("영상 제목(30자 이하) : ");
-					input = sc.next();
-					if(input.length() > 30) System.out.println("30자리 이하로 입력하세요.");
+					System.out.println("*영상 제목(30자 이하) : ");
+					input = sc.nextLine();
+					if(input.equals("")) System.out.println("필수정보는 생략할 수 없습니다.");
+					else if(input.length() > 30) System.out.println("30자리 이하로 입력하세요.");
 		            else {
 						sql = sql + "'" + input + "',";
 						break;
@@ -40,57 +41,66 @@ public class admin {
 				}
 				while (true) {
 					System.out.println("영상물 타입(20자 이하) : ");
-					input = sc.next();
+					input = sc.nextLine();
 					if(input.length() > 20) System.out.println("20자리 이하로 입력하세요.");
 		            else {
-						sql = sql + "'" + input + "',";
+		            	if(!input.equals("")) sql += "'" + input + "',";
+						else sql += "NULL,";
 						break;
 		            }
 				}
+
 				while (true) {
 					System.out.println("관람등급 (성인용:R입력 / 그 외:A입력) :");
-					input = sc.next();
-					if (input.equals("R")||input.equals("A")||input.equals("")) {
-						sql = sql + "'" + input + "',";
+					input = sc.nextLine();
+					if (input.equals("R")||input.equals("A")) {
+						sql += "'" + input + "',";
 						break;
-					}
-					else {
+					} else if(input.equals("")) {
+						sql += "NULL,";
+						break;
+					} else {
 						System.out.println("R혹은 A를 입력해주세요");
 					}
 				}
+
 				while (true) {
-				System.out.println("개봉일 (yyyy-mm-dd) : ");
-				input = sc.next();
-					try{
-				        SimpleDateFormat  dateFormat = new  SimpleDateFormat("yyyy-MM-dd");
-				        dateFormat.setLenient(false);
-				        dateFormat.parse(input);
-						sql = sql + "to_date('" + input + "','yyyy-mm-dd'),";
-						break;			         
-			        }catch (ParseException  e){
-			        	System.out.println("잘못된 날짜 양식입니다.");
-			        	continue;
-				    }
+					System.out.println("개봉일 (yyyy-mm-dd) : ");
+					input = sc.nextLine();
+					if(input.equals("")) {
+						sql += "NULL,";
+						break;
+					} else {
+						try {
+							SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+							dateFormat.setLenient(false);
+							dateFormat.parse(input);
+							sql = sql + "to_date('" + input + "','yyyy-mm-dd'),";
+							break;
+						} catch (ParseException e) {
+							System.out.println("잘못된 날짜 양식입니다.");
+						}
+					}
 				}
 				
 				while(true) {
 					System.out.println("상영시간 (분단위): ");
-					try {
-						int _input = sc.nextInt();
-						input = Integer.toString(_input);
-						sql = sql + input + ",";
+					input = sc.nextLine();
+					if(input.equals("")){
+						sql += "NULL,";
 						break;
-					}catch(InputMismatchException e){
+					} else if(!input.matches("[0-9]+")){
 						System.out.println("유효하지 않은 숫자 입니다.");
-						sc.next();
-						continue;
+					} else {
+						sql += input + ",";
+						break;
 					}
 				}
 				
 				while(true) {
 					System.out.println("아래의 장르중 선택하세요.");
-					sql = "SELECT * FROM GENRE";
-					rs = stmt.executeQuery(sql);
+					String sub_sql = "SELECT * FROM GENRE";
+					rs = stmt.executeQuery(sub_sql);
 					String genre;
 					int cnt = 1;
 					ArrayList<String> gen_list = new ArrayList<>();
@@ -105,9 +115,11 @@ public class admin {
 						int idx = sc.nextInt();
 						sc.nextLine();
 						input = gen_list.get(idx-1);
+						sql += "'" + input + "')";
 						break;
 					} catch (InputMismatchException e){
 						System.out.println("잘못된 입력입니다.");
+						sc.next();
 						continue;
 					} catch (IndexOutOfBoundsException e){
 						System.out.println("잘못된 입력입니다.");
@@ -121,7 +133,6 @@ public class admin {
 				System.err.println("영상물 추가 오류 : " + ex.getMessage());
 				System.exit(1);
 			}
-		
 		}
 	}
 
