@@ -191,12 +191,49 @@ public class search {
             }
             if(gCnt > 0) sb.append(")");
 
-            System.out.print("\n영상물 Runtime을 입력하세요 (ex)110 180입력시 110분~180분 사이의 runtime을 가진 영상물 선택\n 상관없는 경우 0 0을 입력하세요.: ");
-            int a = scan_option.nextInt();
-            int b = scan_option.nextInt();
-            if(a != 0 && b != 0 && a <= b){
-                sb.append(" AND Runtime_minutes >= " + a + " and Runtime_minutes <= " + b );
-            }
+             System.out.print("\n영상물 Runtime의 범위를 입력받습니다. ");
+        
+        int min = 0;
+        int max = 0;
+        
+        String a;
+        String b;
+        
+        while(true){
+            while(true){
+                System.out.print("\n 최소 러닝타임을 입력하세요. : ");
+             
+                a = scan_option.nextLine();
+                if(a.equals("")) System.out.println("공란입니다. 최소 러닝타임을 입력하세요. 상관없을 시 0을 입력하세요");
+                 else if(!a.matches("[0-9]+")) System.out.println(" 0이상의 정수만 입력가능 합니다.");
+                 else break;
+             }
+            min = Integer.parseInt(a);
+            if(min < 0) System.out.println("0이상의 값으로 입력하세요");
+            else break;
+        }
+        
+       
+        while(true){
+            while(true){
+                System.out.print("\n 최대 러닝타임을 입력하세요. (공란 가능) : ");
+             
+                b = scan_option.nextLine();
+                if(b.equals("")) { System.out.println("최대 러닝타임에 제한을 두지 않습니다."); b="20000"; break;  }
+                 else if(!b.matches("[0-9]+")) System.out.println(" 0이상의 정수만 입력가능 합니다.");
+                 else break;
+             }
+            max = Integer.parseInt(b);
+            if(max < 0) System.out.println("0이상의 값으로 입력하세요");
+            else if(min > max) System.out.println("범위가 잘못되었습니다. 최소 시간보다 크게 입력하세요.");
+            else break;
+        }
+        
+        if(min >= 0 && max >= 0 && min <= max){
+            sb.append(" AND Runtime_minutes >= " + min + " and Runtime_minutes <= " + max );
+        }
+            
+            
             sb.append(" ORDER BY tconst");
 
             sql = sb.toString();
