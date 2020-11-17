@@ -260,10 +260,37 @@ public class search {
         String sql = "";
         ResultSet rs = null;
         String tconst = "";
-
-        System.out.print("\n정보 확인 및 평가할 영상물의 식별번호를 입력하세요 (ex t00000218) : ");
-        Scanner scan = new Scanner(System.in);
-        tconst = scan.nextLine();
+        Scanner scan = null;
+        while(true) {
+        try {
+           
+              System.out.print("\n정보 확인 및 평가할 영상물의 식별번호를 입력하세요 (ex t00000218) : ");
+              scan = new Scanner(System.in);
+              tconst = scan.nextLine();
+              System.out.println(tconst);
+              sql = "SELECT tconst FROM MOVIE where tconst = '" + tconst + "'";
+              rs = stmt.executeQuery(sql);
+            ResultSetMetaData resultSetMetaData = rs.getMetaData();
+   
+            //System.out.println(sql);
+            if(!rs.isBeforeFirst()) {
+               System.out.println("일치하는 영상이 없습니다.");
+               System.out.println("다른 영상을 찾으시겠습니까?(Y:yes, N:no)");
+               String q;
+               q = scan.nextLine();
+               if (q.equals("y") || q.equals("Y") || q.equals("yes") || q.equals("YES")) continue;
+               else if(q.equals("n") || q.equals("N") || q.equals("no") || q.equals("NO")) break;
+               else {
+                  System.out.println("잘못된 값입니다. 이전메뉴로 돌아갑니다.");
+                  break;
+               }
+            }
+        }catch(SQLException ex) {
+         System.err.println("sql error = " + ex.getMessage());
+         System.exit(1);
+      }
+     
+        
         //제목, 종류, 재생시간, 상영 년도, 장르 , 버전, 평가 유무
         sql = "SELECT tconst, title, title_type, Start_Year, Runtime_Minutes, genre FROM MOVIE, GENRE WHERE MOVIE.tconst = '"+tconst+"' and GENRE.GENRE_CODE = MOVIE.GCODE";
         //System.out.println(sql);
@@ -322,81 +349,105 @@ public class search {
 
             System.out.println("영상물을 평가하시겠습니까?(Y:Yes, N:No)");
             String q = scan.nextLine();
-            if(q.equals("y") || q.equals("Y") || q.equals("YES") || q.equals("yes")) movie_rate(conn, stmt, tconst);
-
+            if(q.equals("y") || q.equals("Y") || q.equals("YES") || q.equals("yes")) {
+               movie_rate(conn, stmt, tconst);
+               break;
+            }
+            else if(q.equals("n") || q.equals("N") || q.equals("no") || q.equals("NO")) break;
+         else {
+            System.out.println("잘못된 값입니다. 이전메뉴로 돌아갑니다.");
+            break;
+         }
         } catch(SQLException ex) {
             System.err.println("sql error : " + ex.getMessage());
             System.exit(1);
         }
-
+        }
     }
 
     public static void movie_rate(Connection conn, Statement stmt, String tconst){
         String sql = "";
         ResultSet rs = null;
-        Scanner scan = new Scanner(System.in);
-        String ac_ID = account.ID;
-        System.out.print("\n영상물에 대한 평점을 입력해주세요 (0.0~10.0) : ");
-        double rating = scan.nextDouble();
-
-        String maxconst = "";
-        //insert할 테이블 RATING PROVIDES
-        //insert into RATING values (	't00000141',	'r00000141',	9Average_Rating	);
-        //INSERT INTO PROVIDES VALUES (	4	,'r00000008'R_ID	,'Knouted'A_Id	);
-
-        //다음순서의 r_ID값을 구하기 위해서, rating에 있는 r_ID값중에서 가장 큰 값에 +1을 한다.
-        //이제 tconst를 받았다.RATING에 tconst, 다음순서의 r_ID값, 0(average_rating)을넣고 insert한다.
-        // provides에 사용자가 입력한 평점, R_ID(rating에서 쓴것 그대로), A_ID(사용자가 입력한 id), 를 insert한다.
-        //tconst가 가진 평점들의 값을 더한 뒤에 평점의 갯수만큼 나누어서 평균 평점을 구한다. 그냥 avg로 바로 구할 수 있다.
-        //이제 그 avg값을 tconst의 rating의 Average_Rating에 update한다.
-
-        try {
-            sql = "SELECT r_id FROM RATING WHERE tcon = '" + tconst + "'";
-            System.out.println(sql);
-            rs = stmt.executeQuery(sql);
-            if(!rs.isBeforeFirst()) {
-                sql = "select max(R_ID) from RATING";
-
-                rs = stmt.executeQuery(sql);
-                rs.next();
-                maxconst = rs.getString(1);
-                maxconst = maxconst.replace("r", "");
-                int temp = Integer.parseInt(maxconst);
-                temp++;
-                maxconst = String.format("%08d", temp);
-                maxconst = "r" + maxconst;
-
-                sql = "insert into RATING values('" + tconst + "', '" + maxconst + "', 0 )";
-                rs = stmt.executeQuery(sql);
-                conn.commit();
-            }
-            else{
-                rs.next();
-                maxconst = rs.getString(1);
-            }
-
-            //System.out.print("rating insert 완료 !! ");
-
-            // provides에 사용자가 입력한 평점, R_ID(rating에서 쓴것 그대로), A_ID(사용자가 입력한 id), 를 insert한다.
-            //tconst가 가진 평점들의 값을 provides를 통해 더한 뒤에 평점의 갯수만큼 나누어서 평균 평점을 구한다. 그냥 avg로 바로 구할 수 있다.
-            //이제 그 avg값을 tconst의 rating의 Average_Rating에 update한다.
-
-            sql = "insert into PROVIDES values( " + rating + " ,  '" + maxconst + "', '" + ac_ID + "')"; //여기서 ac_ID만 사용자 이름이면 된다. account table에 없는 이름을 넣으면 참조무결성제약 위반.
-            rs = stmt.executeQuery(sql);
-            conn.commit();
-            //ystem.out.print("\n provides insert 진입 @@ ");
-
-            sql = "select AVG(Rating) FROM PROVIDES WHERE R_ID = '" + maxconst + "'";
-            rs = stmt.executeQuery(sql);
-            rs.next();
-            Double mean = rs.getDouble(1);
-            mean = Math.round(mean*10.0)/10.0;
-            sql = "update RATING SET Average_Rating = " + mean + " WHERE  Tcon = '" + tconst  + "'";
-            rs = stmt.executeQuery(sql);
-            conn.commit();
-            System.out.println("평가 입력이 완료되었습니다.\n");
-        } catch (SQLException e) {
-            e.printStackTrace();
+        Scanner scan;
+        double rating;
+        while (true) {
+           scan = new Scanner(System.in);
+           String ac_ID = account.ID;
+           
+           System.out.print("\n영상물에 대한 평점을 입력해주세요 (0.0~10.0) : ");
+           
+           try {
+              rating = scan.nextDouble();
+               if (rating < 0 || rating >10) {
+                 System.out.println("0.0점부터 10.0점 사이의 값을 입력해주세요");
+                 continue;
+              }
+           } catch (InputMismatchException e) {
+              System.out.println("잘못된 입력입니다. 숫자를 입력해주세요.");
+              continue;
+           }
+           String maxconst = "";
+           //insert할 테이블 RATING PROVIDES
+           //insert into RATING values (   't00000141',   'r00000141',   9Average_Rating   );
+           //INSERT INTO PROVIDES VALUES (   4   ,'r00000008'R_ID   ,'Knouted'A_Id   );
+   
+           //다음순서의 r_ID값을 구하기 위해서, rating에 있는 r_ID값중에서 가장 큰 값에 +1을 한다.
+           //이제 tconst를 받았다.RATING에 tconst, 다음순서의 r_ID값, 0(average_rating)을넣고 insert한다.
+           // provides에 사용자가 입력한 평점, R_ID(rating에서 쓴것 그대로), A_ID(사용자가 입력한 id), 를 insert한다.
+           //tconst가 가진 평점들의 값을 더한 뒤에 평점의 갯수만큼 나누어서 평균 평점을 구한다. 그냥 avg로 바로 구할 수 있다.
+           //이제 그 avg값을 tconst의 rating의 Average_Rating에 update한다.
+   
+           try {
+               sql = "SELECT r_id FROM RATING WHERE tcon = '" + tconst + "'";
+//               System.out.println(sql);
+               rs = stmt.executeQuery(sql);
+               if(!rs.isBeforeFirst()) {
+                   sql = "select max(R_ID) from RATING";
+   
+                   rs = stmt.executeQuery(sql);
+                   rs.next();
+                   maxconst = rs.getString(1);
+                   maxconst = maxconst.replace("r", "");
+                   int temp = Integer.parseInt(maxconst);
+                   temp++;
+                   maxconst = String.format("%08d", temp);
+                   maxconst = "r" + maxconst;
+   
+                   sql = "insert into RATING values('" + tconst + "', '" + maxconst + "', 0 )";
+                   rs = stmt.executeQuery(sql);
+                   conn.commit();
+               }
+               else{
+                   rs.next();
+                   maxconst = rs.getString(1);
+               }
+   
+               //System.out.print("rating insert 완료 !! ");
+   
+               // provides에 사용자가 입력한 평점, R_ID(rating에서 쓴것 그대로), A_ID(사용자가 입력한 id), 를 insert한다.
+               //tconst가 가진 평점들의 값을 provides를 통해 더한 뒤에 평점의 갯수만큼 나누어서 평균 평점을 구한다. 그냥 avg로 바로 구할 수 있다.
+               //이제 그 avg값을 tconst의 rating의 Average_Rating에 update한다.
+   
+               sql = "insert into PROVIDES values( " + rating + " ,  '" + maxconst + "', '" + ac_ID + "')"; //여기서 ac_ID만 사용자 이름이면 된다. account table에 없는 이름을 넣으면 참조무결성제약 위반.
+               rs = stmt.executeQuery(sql);
+               conn.commit();
+               //ystem.out.print("\n provides insert 진입 @@ ");
+   
+               sql = "select AVG(Rating) FROM PROVIDES WHERE R_ID = '" + maxconst + "'";
+               rs = stmt.executeQuery(sql);
+               rs.next();
+               Double mean = rs.getDouble(1);
+               mean = Math.round(mean*10.0)/10.0;
+               sql = "update RATING SET Average_Rating = " + mean + " WHERE  Tcon = '" + tconst  + "'";
+               rs = stmt.executeQuery(sql);
+               conn.commit();
+               System.out.println("평가 입력이 완료되었습니다.\n");
+               break;
+           } catch (SQLException e) {
+               e.printStackTrace();
+               System.exit(1);
+           }
         }
     }
+    
 }
