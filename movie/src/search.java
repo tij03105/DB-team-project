@@ -268,11 +268,25 @@ public class search {
               scan = new Scanner(System.in);
               tconst = scan.nextLine();
               System.out.println(tconst);
+              sql = "select tconst from movie where tconst IN (SELECT tcon FROM RATING R, PROVIDES P WHERE A_ID = '" + account.ID + "' AND P.R_ID = R.R_ID) and tconst = '" + tconst + "'";
+              rs = stmt.executeQuery(sql);
+              ResultSetMetaData resultSetMetaData = rs.getMetaData();
+              if(rs.isBeforeFirst()) {
+                  System.out.println("이미 평가하신 영상입니다.");
+                  System.out.println("다른 영상을 찾으시겠습니까?(Y:yes, N:no)");
+                  String q;
+                  q = scan.nextLine();
+                  if (q.equals("y") || q.equals("Y") || q.equals("yes") || q.equals("YES")) continue;
+                  else if(q.equals("n") || q.equals("N") || q.equals("no") || q.equals("NO")) break;
+                  else {
+                     System.out.println("잘못된 값입니다. 이전메뉴로 돌아갑니다.");
+                     break;
+                  }
+              }
               sql = "SELECT tconst FROM MOVIE where tconst = '" + tconst + "'";
               rs = stmt.executeQuery(sql);
-            ResultSetMetaData resultSetMetaData = rs.getMetaData();
+              resultSetMetaData = rs.getMetaData();
    
-            //System.out.println(sql);
             if(!rs.isBeforeFirst()) {
                System.out.println("일치하는 영상이 없습니다.");
                System.out.println("다른 영상을 찾으시겠습니까?(Y:yes, N:no)");
