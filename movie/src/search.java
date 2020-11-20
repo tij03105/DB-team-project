@@ -129,7 +129,7 @@ public class search {
                     System.out.println(cnt + "   " + m_type);
                     cnt++;
                 }
-                System.out.println("타입선택(번호), 상관 없음 : 0");
+                System.out.println("타입선택(번호), 상관 없음(0) : ");
                 try{
                     int idx = scan_option.nextInt();
                     scan_option.nextLine();
