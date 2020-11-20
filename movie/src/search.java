@@ -89,7 +89,7 @@ public class search {
                     cnt++;
                 }
 
-                System.out.printf("번호(버전선택), 공백(상관없음 or 선택종료):");
+                System.out.printf("번호(버전선택), 공백( or 선택종료):");
                 try {
                     String input = scan_option.nextLine();
                     if (input.equals("")) break;
