@@ -44,7 +44,7 @@ public class search {
         try {
             stmt = conn.createStatement();
             sql = "SELECT tconst, title FROM MOVIE WHERE title LIKE '%" + title + "%' AND tconst NOT IN " +
-                          "(SELECT tcon FROM RATING R, PROVIDES P WHERE A_ID = '" + account.ID + "' AND P.R_ID = R.R_ID)";
+                          "(SELECT tcon FROM RATING R, PROVIDES P WHERE A_ID = '" + account.ID + "' AND P.R_ID = R.R_ID) ORDER BY tconst";
             rs = stmt.executeQuery(sql);
             
             if(!rs.isBeforeFirst()) {//검색 결과가 없는 경우
