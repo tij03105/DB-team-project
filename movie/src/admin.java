@@ -335,6 +335,7 @@ public class admin {
 								conn.commit();
 								System.out.println("변경이 완료되었습니다.");
 								sc.nextLine();
+								if(cus_id.equals(account.ID) && idx != MEMBERSHIP.length) account.ADMIN = false;
 								return;
 							} catch (InputMismatchException e) {
 								System.out.println("입력 형식이 잘못되었습니다.");
