@@ -168,7 +168,7 @@ public class search {
                     cnt++;
                 }
 
-                System.out.printf("번호(장르선택), 공백(선택안함):");
+                System.out.printf("번호(장르선택), 공백(상관없음 or 선택종료):");
                 try {
                     String input = scan_option.nextLine();
                     if(input.equals("")) break;
