@@ -301,7 +301,7 @@ public class admin {
     		String cus_id = "";
 
     		while(true) {
-				System.out.println("변경할 회원의 이름을 입력하세요.");
+				System.out.println("변경할 회원의 ID를 입력하세요.");
 				cus_id = sc.nextLine();
 				try {
 					String sql = "SELECT id, membership FROM ACCOUNT WHERE id = '" + cus_id + "'";
